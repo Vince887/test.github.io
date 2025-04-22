@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习力自测</title>
+    <style>
+        body {
+            font-family: 'Microsoft Yahei', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 20px auto;
+            display: none;
+        }
+
+        .active {
+            display: block;
+        }
+
+        h2 {
+            color: #1a73e8;
+            margin-bottom: 25px;
+            font-size: 1.4em;
+        }
+
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option-btn {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            font-size: 16px;
+        }
+
+        .option-btn:hover {
+            border-color: #1a73e8;
+            background: #f8f9ff;
+        }
+
+        .progress {
+            text-align: center;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        #result {
+            text-align: center;
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+
+        .highlight {
+            color: #1a73e8;
+            font-weight: bold;
+            font-size: 1.4em;
+        }
+    </style>
+</head>
+<body>
+    <!-- 题目卡片 -->
+    <div class="card active" data-id="1">
+        <div class="progress">1/12</div>
+        <h2>1. 我相信努力比天赋更重要</h2>
+        <div class="options">
+            <button class="option-btn" data-score="1">完全不符合</button>
+            <button class="option-btn" data-score="2">不太符合</button>
+            <button class="option-btn" data-score="3">不确定</button>
+            <button class="option-btn" data-score="4">比较符合</button>
+            <button class="option-btn" data-score="5">完全符合</button>
+        </div>
+    </div>
+
+    <!-- 其他题目结构类似... -->
+    
+    <!-- 结果页 -->
+    <div class="card" id="result-card">
+        <div id="result">
+            <p class="highlight">测试完成！你的总分是：<span id="total-score">0</span></p>
+            <p>恭喜，你已经完成测试啦！<br>在社群里回复"评分标准"<br>即可领取【学习力自测评分标准及建议】！</p>
+        </div>
+    </div>
+
+    <script>
+        // 题目数据
+        const questions = [
+            "我相信努力比天赋更重要",
+            "我学习时有清晰的目标",
+            "我在学习中能做到心无杂念、保持专注",
+            "我知道我在什么时间学习效率最高",
+            "每次试卷发下来，我都会认真查找和反思自己的薄弱知识点",
+            "我会把大目标分解为一些小目标并努力去一一实现",
+            "我喜欢做那些难题，而不是我本来就会的题目",
+            "我喜欢思考知识背后的原理和规律",
+            "我通过考试发现自己的知识漏洞",
+            "在练习中我能够保持平静",
+            "对于不会的题目，我会反复研究同类题，直到完全弄懂为止",
+            "我愿意花很多时间弄懂一个知识点"
+        ];
+
+        // 初始化
+        let currentQuestion = 0;
+        let scores = new Array(questions.length).fill(0);
+        
+        // 创建题目卡片
+        const container = document.body;
+        questions.forEach((q, index) => {
+            if(index === 0) return; // 跳过第一个已存在的
+            
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.dataset.id = index + 1;
+            card.innerHTML = `
+                <div class="progress">${index + 1}/12</div>
+                <h2>${index + 1}. ${q}</h2>
+                <div class="options">
+                    ${[1,2,3,4,5].map(score => `
+                        <button class="option-btn" data-score="${score}">
+                            ${['完全不符合','不太符合','不确定','比较符合','完全符合'][score-1]}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+            container.insertBefore(card, document.getElementById('result-card'));
+        });
+
+        // 事件监听
+        document.body.addEventListener('click', (e) => {
+            if(!e.target.classList.contains('option-btn')) return;
+            
+            const card = e.target.closest('.card');
+            const qIndex = parseInt(card.dataset.id) - 1;
+            scores[qIndex] = parseInt(e.target.dataset.score);
+            
+            if(qIndex < questions.length - 1) {
+                card.classList.remove('active');
+                document.querySelector(`[data-id="${qIndex + 2}"]`).classList.add('active');
+            } else {
+                showResult();
+            }
+        });
+
+        function showResult() {
+            document.querySelector('.active').classList.remove('active');
+            document.getElementById('result-card').classList.add('active');
+            document.getElementById('total-score').textContent = 
+                scores.reduce((a, b) => a + b, 0);
+        }
+    </script>
+</body>
+</html>
